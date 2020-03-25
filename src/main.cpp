@@ -9,7 +9,7 @@
 using namespace std;
 
 static int timer = 0;		// Delay the initialization by a little bit.
-static int timerTarget = 90;	// Assuming 30 frames per second here, this is how it is when loading the game. We delay it by 6 seconds.
+static int timerTarget = 10; // 10 frames.
 static bool attemptTransform = false;
 
 enum class TransformErrorCode
@@ -53,20 +53,24 @@ TransformErrorCode TransformWindow()
 		int WINDOW_WIDTH = desktop.right;
 		int WINDOW_HEIGHT = desktop.bottom;
 
-		SetMenu(wHandle, NULL);
+		string log = "Attempting to transform into a window of size: " + to_string(WINDOW_WIDTH) + "x" + to_string(WINDOW_HEIGHT);
+		PD2HOOK_LOG_LOG(log.c_str());
 
 		LONG lStyle = GetWindowLong(wHandle, GWL_STYLE);
 		lStyle &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+		PD2HOOK_LOG_LOG("SetWindowLong pass 1");
 		SetWindowLong(wHandle, GWL_STYLE, lStyle);
 
 		LONG lExStyle = GetWindowLong(wHandle, GWL_EXSTYLE);
 		lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
+		PD2HOOK_LOG_LOG("SetWindowLong pass 2");
 		SetWindowLong(wHandle, GWL_EXSTYLE, lExStyle);
 
+		PD2HOOK_LOG_LOG("Show window");
+
 		ShowWindow(wHandle, SW_SHOW);
+		PD2HOOK_LOG_LOG("Set window pos and size.");
 		SetWindowPos(wHandle, NULL, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
-		
-		UpdateWindow(wHandle);
 
 		return TransformErrorCode::SUCCESS;
 	}
