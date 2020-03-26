@@ -53,6 +53,9 @@ TransformErrorCode TransformWindow()
 		int WINDOW_WIDTH = desktop.right;
 		int WINDOW_HEIGHT = desktop.bottom;
 
+		WINDOW_WIDTH = GetSystemMetrics(SM_CXSCREEN);
+		WINDOW_HEIGHT = GetSystemMetrics(SM_CYSCREEN);
+
 		string log = "Attempting to transform into a window of size: " + to_string(WINDOW_WIDTH) + "x" + to_string(WINDOW_HEIGHT);
 		PD2HOOK_LOG_LOG(log.c_str());
 
@@ -65,12 +68,15 @@ TransformErrorCode TransformWindow()
 		lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
 		PD2HOOK_LOG_LOG("SetWindowLong pass 2");
 		SetWindowLong(wHandle, GWL_EXSTYLE, lExStyle);
+		
+		PD2HOOK_LOG_LOG("SetWindowLongPtr");
+		SetWindowLongPtr(wHandle, GWL_STYLE, WS_VISIBLE | WS_POPUP);
 
 		PD2HOOK_LOG_LOG("Show window");
 
 		ShowWindow(wHandle, SW_SHOW);
 		PD2HOOK_LOG_LOG("Set window pos and size.");
-		SetWindowPos(wHandle, NULL, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+		SetWindowPos(wHandle, NULL, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, SWP_FRAMECHANGED);
 
 		return TransformErrorCode::SUCCESS;
 	}
